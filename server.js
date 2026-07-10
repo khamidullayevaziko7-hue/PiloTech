@@ -5,13 +5,17 @@ const mongoose = require('mongoose');
 
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const statsRoutes = require('./routes/stats');
+const commentRoutes = require('./routes/comments');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '12mb' }));
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.get('/', (req, res) => res.send('Do\'kon API ishlayapti'));
 
