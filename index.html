@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiloTech — Kompyuter texnikasi & Gaming</title>
+<style>
+  :root{
+    --bg:#0E1113;
+    --panel:#161A1D;
+    --panel-2:#1D2227;
+    --line: rgba(228,231,235,0.10);
+    --text:#E4E7EB;
+    --dim:#8A929B;
+    --blue:#2F86FF;
+    --blue-soft: rgba(47,134,255,0.14);
+    --orange:#FF7A45;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{ font-family:ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace; }
+  h1,h2,h3{ font-weight:700; letter-spacing:-0.015em; }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(47,134,255,0.5); }
+    50%{ box-shadow:0 0 0 6px rgba(47,134,255,0); }
+  }
+  .fade-up{ animation: fadeUp 0.5s ease both; }
+
+  /* ---- Header ---- */
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px;
+    background:rgba(14,17,19,0.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{ font-size:20px; font-weight:700; }
+  .logo .pilo{ color:var(--text); }
+  .logo .tech{ color:var(--blue); }
+  .logo .dot{ color:var(--orange); }
+  .cart-btn{
+    background:var(--panel-2); color:var(--text);
+    border:1px solid var(--line); border-radius:10px;
+    padding:9px 14px; font-weight:600; font-size:13px;
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .cart-btn:active{ transform:scale(0.94); background:var(--panel); }
+  .cart-count{
+    background:var(--blue); color:#fff;
+    border-radius:5px; min-width:18px; height:18px; padding:0 4px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700;
+    transition: transform 0.2s ease;
+  }
+
+  /* ---- Banner carousel ---- */
+  .carousel{
+    position:relative; margin:14px 18px 0; border-radius:16px; overflow:hidden;
+    aspect-ratio:16/9; background:var(--panel);
+    border:1px solid var(--line);
+  }
+  .carousel-track{
+    display:flex; height:100%; transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .slide{
+    flex:0 0 100%; height:100%; position:relative;
+    background-size:cover; background-position:center;
+    display:flex; align-items:flex-end;
+    /* Rasm qo'shish uchun: har bir .slide'ga background-image: url('RASM_MANZILI') qo'shing */
+  }
+  .slide.s1{ background:linear-gradient(135deg,#1B2C4E,#0E1113); }
+  .slide.s2{ background:linear-gradient(135deg,#142B22,#0E1113); }
+  .slide.s3{ background:linear-gradient(135deg,#2A1B3D,#0E1113); }
+  .slide-caption{
+    padding:18px; width:100%;
+    background:linear-gradient(0deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+  }
+  .slide-caption .tag{
+    font-size:11px; color:var(--blue); font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .slide-caption h2{ font-size:20px; color:#fff; margin-top:4px; }
+  .carousel-dots{
+    position:absolute; bottom:10px; right:14px; display:flex; gap:6px;
+  }
+  .dot{
+    width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.35);
+    cursor:pointer; transition: all 0.25s ease;
+  }
+  .dot.active{ background:#fff; width:16px; border-radius:3px; }
+
+  /* ---- Hero ---- */
+  .hero{ padding:26px 18px 22px; border-bottom:1px solid var(--line); }
+  .hero .status-line{
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; color:var(--blue); font-weight:600;
+    letter-spacing:0.04em; text-transform:uppercase; margin-bottom:12px;
+  }
+  .status-dot{
+    width:6px; height:6px; border-radius:50%; background:var(--blue);
+    animation: pulse 2s infinite;
+  }
+  .hero h1{ font-size:28px; line-height:1.15; max-width:320px; }
+  .hero p{ color:var(--dim); max-width:300px; margin-top:10px; font-size:14px; line-height:1.5; }
+
+  .stat-row{ display:flex; gap:20px; margin-top:18px; }
+  .stat .num{ font-size:19px; font-weight:700; color:var(--text); }
+  .stat .label{ font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em; }
+
+  /* ---- Category tabs ---- */
+  .categories{ display:flex; gap:8px; padding:16px 18px; overflow-x:auto; border-bottom:1px solid var(--line); }
+  .pill{
+    flex:0 0 auto; padding:8px 14px; border-radius:20px;
+    border:1px solid var(--line); background:var(--panel); color:var(--dim);
+    font-weight:600; font-size:12.5px; cursor:pointer; white-space:nowrap;
+    transition: all 0.2s ease;
+  }
+  .pill.active{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .pill:active{ transform:scale(0.95); }
+
+  /* ---- Product grid ---- */
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:18px; }
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; display:flex; flex-direction:column;
+    position:relative;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card:active{ transform:scale(0.97); }
+  .card-img{
+    aspect-ratio:1/1; background: linear-gradient(135deg, var(--panel-2) 0%, var(--bg) 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; color:var(--dim); letter-spacing:0.06em; text-transform:uppercase;
+    background-size:cover; background-position:center;
+    /* Rasm qo'shish uchun: shu elementga background-image: url('RASM_MANZILI') qo'shing */
+  }
+  .card-body{ padding:11px; display:flex; flex-direction:column; gap:5px; flex:1; }
+  .card-sku{ font-size:10px; color:var(--dim); }
+  .card-name{ font-size:13px; font-weight:600; line-height:1.3; }
+  .card-specs{ font-size:10.5px; color:var(--dim); line-height:1.5; }
+  .card-price{ margin-top:auto; padding-top:6px; font-weight:700; font-size:15px; color:var(--blue); }
+  .card-price .old{ font-size:11px; color:var(--dim); text-decoration:line-through; font-weight:400; margin-left:6px; }
+  .add-btn{
+    margin-top:8px; width:100%; padding:9px; border-radius:8px;
+    background:transparent; border:1px solid var(--blue); color:var(--blue);
+    font-weight:700; font-size:12px; cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .add-btn:active{ background:var(--blue); color:#fff; transform:scale(0.96); }
+  .stock-badge{
+    position:absolute; top:8px; right:8px;
+    background:rgba(255,122,69,0.15); color:var(--orange);
+    font-size:9px; font-weight:700; padding:3px 6px; border-radius:5px; text-transform:uppercase;
+  }
+
+  /* ---- Cart drawer ---- */
+  .drawer{ position:fixed; inset:0; background:rgba(0,0,0,0.55); display:none; z-index:100; animation: fadeIn 0.2s ease; }
+  .drawer.open{ display:block; }
+  .drawer-panel{
+    position:absolute; right:0; top:0; bottom:0; width:88%; max-width:380px;
+    background:var(--panel); padding:18px; display:flex; flex-direction:column;
+    border-left:1px solid var(--line);
+    animation: slideIn 0.25s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideIn{ from{ transform:translateX(100%);} to{ transform:translateX(0);} }
+  .drawer-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .close-btn{ background:none; border:none; color:var(--text); font-size:22px; cursor:pointer; }
+  .cart-item{ display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); font-size:13px; animation: fadeUp 0.25s ease both; }
+  .cart-item .mono{ color:var(--blue); }
+  .empty-cart{ color:var(--dim); font-size:13px; margin-top:20px; }
+  .cart-total{ margin-top:auto; padding-top:16px; border-top:1px solid var(--line); }
+  .cart-total .row{ display:flex; justify-content:space-between; font-weight:700; margin-bottom:14px; font-size:16px; }
+  .checkout-btn{
+    width:100%; padding:14px; border:none; border-radius:10px;
+    background:var(--blue); color:#fff; font-weight:700; font-size:14px; cursor:pointer;
+    transition: transform 0.15s ease;
+  }
+  .checkout-btn:active{ transform:scale(0.97); }
+  .checkout-btn:disabled{ opacity:0.35; }
+
+  /* ---- Mahsulot modal (izohlar bilan) ---- */
+  .modal{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:110; animation: fadeIn 0.2s ease; }
+  .modal.open{ display:flex; align-items:flex-end; }
+  .modal-panel{
+    background:var(--panel); width:100%; max-height:85vh; overflow-y:auto;
+    border-radius:20px 20px 0 0; border:1px solid var(--line); border-bottom:none;
+    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideUp{ from{ transform:translateY(100%);} to{ transform:translateY(0);} }
+  .modal-img{
+    aspect-ratio:16/10; background:linear-gradient(135deg, var(--panel-2), var(--bg));
+    background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:11px;
+  }
+  .modal-body{ padding:18px; }
+  .modal-close{
+    position:sticky; top:10px; float:right; margin:-4px 10px 0 0;
+    background:rgba(14,17,19,0.75); border:none; color:#fff; font-size:20px;
+    width:32px; height:32px; border-radius:50%; cursor:pointer; z-index:5;
+  }
+  .modal-name{ font-size:19px; font-weight:700; margin-top:4px; }
+  .modal-price{ color:var(--blue); font-weight:700; font-size:18px; margin-top:6px; }
+  .modal-desc{ color:var(--dim); font-size:13px; line-height:1.6; margin-top:10px; }
+  .modal-add{
+    width:100%; margin-top:16px; padding:13px; border:none; border-radius:10px;
+    background:var(--blue); color:#fff; font-weight:700; font-size:14px; cursor:pointer;
+  }
+
+  .comments-section{ margin-top:24px; border-top:1px solid var(--line); padding-top:16px; }
+  .comments-title{ font-size:14px; font-weight:700; margin-bottom:12px; }
+  .comment{ padding:10px 0; border-bottom:1px solid var(--line); }
+  .comment-name{ font-size:12.5px; font-weight:600; color:var(--blue); }
+  .comment-text{ font-size:13px; color:var(--text); margin-top:3px; line-height:1.5; }
+  .comment-empty{ color:var(--dim); font-size:13px; padding:8px 0; }
+  .comment-form{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .comment-form input, .comment-form textarea{
+    width:100%; padding:10px 12px; background:var(--bg);
+    border:1px solid var(--line); border-radius:8px; color:var(--text);
+    font-family:inherit; font-size:13px;
+  }
+  .comment-form button{
+    padding:11px; border:none; border-radius:8px; background:var(--panel-2);
+    border:1px solid var(--blue); color:var(--blue); font-weight:700; font-size:13px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="pilo">Pilo</span><span class="tech">Tech</span><span class="dot">.</span></div>
+  <button class="cart-btn" onclick="toggleCart(true)">
+    Savat <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<!-- BANNER KARUSEL — har bir .slide ichiga o'zingizning rasm URL'ingizni CSS orqali qo'shing (yuqoridagi izohga qarang) -->
+<div class="carousel" id="carousel">
+  <div class="carousel-track" id="carouselTrack">
+    <div class="slide s1">
+      <div class="slide-caption"><div class="tag">Yangi kelim</div><h2>144Hz monitorlar</h2></div>
+    </div>
+    <div class="slide s2">
+      <div class="slide-caption"><div class="tag">Chegirma</div><h2>Gaming klaviaturalar -15%</h2></div>
+    </div>
+    <div class="slide s3">
+      <div class="slide-caption"><div class="tag">Mashhur</div><h2>Noutbuklar katalogi</h2></div>
+    </div>
+  </div>
+  <div class="carousel-dots" id="carouselDots"></div>
+</div>
+
+<section class="hero fade-up">
+  <div class="status-line"><span class="status-dot"></span>Ombor faol · yangilanmoqda</div>
+  <h1>Texnika va<br>gaming — bir joyda.</h1>
+  <p>Klaviatura, sichqoncha, monitor, noutbuk va gaming uskunalar. Original, kafolat bilan.</p>
+  <div class="stat-row">
+    <div class="stat"><div class="num" id="statCount">0</div><div class="label">Mahsulot</div></div>
+    <div class="stat"><div class="num">24/7</div><div class="label">Buyurtma</div></div>
+    <div class="stat"><div class="num" id="statCats">0</div><div class="label">Kategoriya</div></div>
+  </div>
+</section>
+
+<div class="categories" id="categories"></div>
+<div class="grid" id="grid"></div>
+
+<div class="drawer" id="drawer" onclick="if(event.target===this) toggleCart(false)">
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3 style="font-size:17px;">Savat</h3>
+      <button class="close-btn" onclick="toggleCart(false)">&times;</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="cart-total">
+      <div class="row"><span>Jami</span><span id="cartTotal" class="mono">0 so'm</span></div>
+      <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>Buyurtma berish</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="productModal" onclick="if(event.target===this) closeProduct()">
+  <div class="modal-panel">
+    <button class="modal-close" onclick="closeProduct()">&times;</button>
+    <div class="modal-img" id="modalImg"></div>
+    <div class="modal-body">
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-price mono" id="modalPrice"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <button class="modal-add" id="modalAddBtn">+ Savatga qo'shish</button>
+
+      <div class="comments-section">
+        <div class="comments-title" id="commentsTitle">Izohlar</div>
+        <div id="commentsList"></div>
+        <div class="comment-form">
+          <input type="text" id="commentName" placeholder="Ismingiz" maxlength="60">
+          <textarea id="commentText" rows="2" placeholder="Fikringizni yozing..." maxlength="500"></textarea>
+          <button onclick="submitComment()">Izoh qoldirish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Karusel ----
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('carouselDots');
+  const track = document.getElementById('carouselTrack');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0 ? ' active' : '');
+    d.onclick = () => goToSlide(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goToSlide(i){
+    current = i;
+    track.style.transform = `translateX(-${i * 100}%)`;
+    document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx===i));
+  }
+
+  setInterval(() => {
+    goToSlide((current + 1) % slides.length);
+  }, 4000);
+
+  // Barmoq bilan surish (swipe)
+  let touchStartX = 0;
+  document.getElementById('carousel').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  document.getElementById('carousel').addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 40){
+      if(diff > 0) goToSlide((current + 1) % slides.length);
+      else goToSlide((current - 1 + slides.length) % slides.length);
+    }
+  });
+
+  // ---- Mahsulotlar — backend /api/products dan olinadi ----
+  const API_BASE = 'https://pilotec.onrender.com/api';
+  let CATS = [{ key:'all', label:'Hammasi' }];
+
+  let PRODUCTS = [];
+  let activeCat = 'all';
+  let cart = {};
+
+  function fmt(n){ return n.toLocaleString('uz-UZ') + " so'm"; }
+
+  function buildCategories(){
+    const seen = new Set();
+    const list = [{ key:'all', label:'Hammasi' }];
+    PRODUCTS.forEach(p => {
+      if(p.category && !seen.has(p.category)){
+        seen.add(p.category);
+        list.push({ key:p.category, label:p.category });
+      }
+    });
+    CATS = list;
+  }
+
+  async function loadProducts(){
+    document.getElementById('grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px; font-size:13px;">Yuklanmoqda...</div>`;
+    try{
+      const res = await fetch(`${API_BASE}/products`);
+      if(!res.ok) throw new Error('fetch failed');
+      PRODUCTS = await res.json();
+    }catch(err){
+      document.getElementById('grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px; font-size:13px;">Mahsulotlarni yuklab bo'lmadi. Internetni tekshiring.</div>`;
+      return;
+    }
+    buildCategories();
+    renderCategories();
+    renderGrid();
+  }
+
+  // ---- Tashrif hisoblagichi uchun ping (admin panelda "onlayn" ko'rsatish uchun) ----
+  const sessionId = 'sess_' + Math.random().toString(36).slice(2) + Date.now();
+  function sendPing(){
+    fetch(`${API_BASE}/stats/ping`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ sessionId })
+    }).catch(()=>{});
+  }
+  sendPing();
+  setInterval(sendPing, 20000);
+
+  function renderCategories(){
+    document.getElementById('categories').innerHTML = CATS.map(c =>
+      `<button class="pill ${c.key===activeCat?'active':''}" onclick="setCat('${c.key}')">${c.label}</button>`
+    ).join('');
+  }
+  function setCat(key){ activeCat = key; renderCategories(); renderGrid(); }
+
+  function renderGrid(){
+    const list = activeCat==='all' ? PRODUCTS : PRODUCTS.filter(p=>p.category===activeCat);
+    document.getElementById('statCount').textContent = PRODUCTS.length;
+    document.getElementById('statCats').textContent = Math.max(CATS.length - 1, 0);
+    if(!list.length){
+      document.getElementById('grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px; font-size:13px;">Bu kategoriyada mahsulot yo'q</div>`;
+      return;
+    }
+    document.getElementById('grid').innerHTML = list.map((p, idx) => {
+      const img = (p.images && p.images[0]) ? p.images[0] : '';
+      return `
+      <div class="card fade-up" style="animation-delay:${idx*0.04}s" onclick="openProduct('${p._id}')">
+        ${p.stock<=3 ? `<div class="stock-badge">Kam qoldi</div>` : ''}
+        <div class="card-img" style="${img ? `background-image:url('${img}')` : ''}">${img ? '' : (p.category || '').toUpperCase()}</div>
+        <div class="card-body">
+          <div class="card-name">${p.name}</div>
+          ${p.description ? `<div class="card-specs">${p.description}</div>` : ''}
+          <div class="card-price mono">${fmt(p.price)}${p.oldPrice?`<span class="old">${fmt(p.oldPrice)}</span>`:''}</div>
+          <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p._id}')">+ Savatga</button>
+        </div>
+      </div>
+    `}).join('');
+  }
+
+  function addToCart(id){ cart[id] = (cart[id]||0) + 1; renderCart(); }
+  function removeFromCart(id){ delete cart[id]; renderCart(); }
+
+  function renderCart(){
+    const ids = Object.keys(cart);
+    document.getElementById('cartCount').textContent = ids.reduce((s,id)=>s+cart[id],0);
+    const itemsEl = document.getElementById('cartItems');
+    if(!ids.length){
+      itemsEl.innerHTML = `<div class="empty-cart">Savat bo'sh</div>`;
+    } else {
+      itemsEl.innerHTML = ids.map(id => {
+        const p = PRODUCTS.find(p=>p._id==id);
+        if(!p) return '';
+        return `<div class="cart-item">
+          <span>${p.name} <span class="mono">×${cart[id]}</span></span>
+          <span class="mono">${fmt(p.price*cart[id])} <button class="close-btn" style="font-size:14px;" onclick="removeFromCart('${id}')">&times;</button></span>
+        </div>`;
+      }).join('');
+    }
+    const total = ids.reduce((s,id)=> {
+      const p = PRODUCTS.find(p=>p._id==id);
+      return p ? s + p.price*cart[id] : s;
+    }, 0);
+    document.getElementById('cartTotal').textContent = fmt(total);
+    document.getElementById('checkoutBtn').disabled = ids.length===0;
+  }
+
+  function toggleCart(open){ document.getElementById('drawer').classList.toggle('open', open); }
+  function checkout(){ alert("Buyurtma qabul qilindi! (Demo) — keyingi bosqichda bu yerga ism/telefon forma va backend ulanadi."); }
+
+  // ---- Mahsulot modal + izohlar ----
+  let currentProductId = null;
+
+  function openProduct(id){
+    const p = PRODUCTS.find(p => p._id === id);
+    if(!p) return;
+    currentProductId = id;
+    const img = (p.images && p.images[0]) ? p.images[0] : '';
+    document.getElementById('modalImg').style.backgroundImage = img ? `url('${img}')` : '';
+    document.getElementById('modalImg').textContent = img ? '' : (p.category||'').toUpperCase();
+    document.getElementById('modalName').textContent = p.name;
+    document.getElementById('modalPrice').textContent = fmt(p.price);
+    document.getElementById('modalDesc').textContent = p.description || '';
+    document.getElementById('modalAddBtn').onclick = () => { addToCart(id); };
+    document.getElementById('commentName').value = '';
+    document.getElementById('commentText').value = '';
+    document.getElementById('productModal').classList.add('open');
+    loadComments(id);
+  }
+
+  function closeProduct(){
+    document.getElementById('productModal').classList.remove('open');
+    currentProductId = null;
+  }
+
+  async function loadComments(id){
+    const listEl = document.getElementById('commentsList');
+    listEl.innerHTML = `<div class="comment-empty">Yuklanmoqda...</div>`;
+    try{
+      const res = await fetch(`${API_BASE}/comments/${id}`);
+      const comments = await res.json();
+      document.getElementById('commentsTitle').textContent = `Izohlar (${comments.length})`;
+      if(!comments.length){
+        listEl.innerHTML = `<div class="comment-empty">Hali izoh yo'q. Birinchi bo'lib fikr bildiring!</div>`;
+        return;
+      }
+      listEl.innerHTML = comments.map(c => `
+        <div class="comment">
+          <div class="comment-name">${escapeHtml(c.name)}</div>
+          <div class="comment-text">${escapeHtml(c.text)}</div>
+        </div>
+      `).join('');
+    }catch(err){
+      listEl.innerHTML = `<div class="comment-empty">Izohlarni yuklab bo'lmadi</div>`;
+    }
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  async function submitComment(){
+    const name = document.getElementById('commentName').value.trim();
+    const text = document.getElementById('commentText').value.trim();
+    if(!name || !text){ alert("Ismingiz va izohingizni yozing"); return; }
+    if(!currentProductId) return;
+    try{
+      const res = await fetch(`${API_BASE}/comments`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ productId: currentProductId, name, text })
+      });
+      if(!res.ok) throw new Error();
+      document.getElementById('commentName').value = '';
+      document.getElementById('commentText').value = '';
+      loadComments(currentProductId);
+    }catch(err){
+      alert("Izohni yuborib bo'lmadi. Qayta urinib ko'ring.");
+    }
+  }
+
+  loadProducts();
+  renderCart();
+</script>
+
+</body>
+</html>
